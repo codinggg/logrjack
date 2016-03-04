@@ -39,7 +39,7 @@ func main() {
 	})
 	entry.Info("OK")
 
-	// Error/panic examples
+	// error/panic examples
 	errorExamples()
 
 	// AddField example
@@ -124,9 +124,9 @@ time="2016-03-04T02:33:18-06:00" level=info msg="Shutting down." uptime=1.0001ms
 This package is meant to output [logfmt](https://github.com/kr/logfmt) formatted text to a file and optionally stdout. It doesn't expose the hooks available in Logrus or extra features in Lumberjack.
 
 Notable differences from Logrus:
-- `Entry` is an interface so it can be passed to other packages.
-- Instead of calling `WithField` and receiving `*Entry`, call `AddField` as above. The Logrus `Entry` is wrapped in an unexposed type. The downside you can't setup a base `Entry` to be passed to multiple routines which write their own additional information. You'll have to call `NewEntry` if you want this behavior.
-- A handy `AddCallstack` method, useful for logging errors and panics. It adds a key named `callstack` and is formatted `dir/file.go:##, dir/file2.go##`. Entries in the callstack which end in `.s`, such as `runtime/asm_amd64.s` are omitted from the callstack. Other runtime source files such as `runtime/panic.go` are included.
+- `Entry` is an interface.
+- Instead of calling `WithField` and receiving `*Entry`, call `AddField` like above. The Logrus `Entry` is wrapped in an unexposed type. The downside is you can't setup a base `Entry` to be passed to multiple routines which write their separate log entries from the same base. Call `NewEntry` and copy the values if you want this behavior.
+- A handy `AddCallstack` method, useful for logging errors and panics. It adds a key named `callstack` and is formatted `dir/file.go:##, dir/file2.go##`. Entries which end in `.s`, such as `runtime/asm_amd64.s`, are omitted from the callstack. If the last entry is `runtime/proc.go` it's also omitted. All other entries are included, including `runtime/panic.go` in a panic recovery.
 - `AddField` takes a `map[string]interface{}` so the interface can be implemented in a nested-vendor setup. You can create your own type as above to shorten the code.
 
 Notable differences from Lumberjack:
@@ -143,6 +143,6 @@ I got tired of copy-pasting this type of code all over the place. It's a conveni
 
 # License
 
-MIT
+MIT.
 
 At the time of this writing both Logrus and Lumberjack are also licensed under MIT.
