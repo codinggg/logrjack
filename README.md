@@ -1,5 +1,5 @@
 # logrjack
-[Logrus](https://github.com/Sirupsen/logrus) (structured logging) and [Lumberjack](https://github.com/natefinch/lumberjack) (rolling logs).
+[Logrus](https://github.com/Sirupsen/logrus) (structured, leveled logging) and [Lumberjack](https://github.com/natefinch/lumberjack) (rolling logs).
 
 # Example
 
