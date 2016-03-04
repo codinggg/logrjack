@@ -10,15 +10,15 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-// LogSettings specifies the options used to initialize Logrus and Lumberjack.
-type LogSettings struct {
+// Settings specifies the options used to initialize Logrus and Lumberjack.
+type Settings struct {
 	// WriteStdout determines if the log will be written to Stdout. The default
 	// is to only write to the log file. When running as a Windows Service make
 	// sure not to write to Stdout.
 	WriteStdout bool
 
 	// Filename is the file to write logs to. Backup log files will be retained
-	// in the same directory. It uses <processpath>/<processname>.log if empty.
+	// in the same directory. It uses <processpath>/logs/<processname>.log if empty.
 	Filename string `json:"filename" yaml:"filename"`
 
 	// MaxSizeMB is the maximum size in megabytes of the log file before it gets
@@ -44,7 +44,7 @@ type LogSettings struct {
 }
 
 // Setup initializes Logrus (structured logged) and Lumberjack (log rolling)
-func Setup(settings LogSettings) {
+func Setup(settings Settings) {
 	if settings.Filename == "" {
 		settings.Filename = getDefaultLogFilename(os.Args[0])
 	}

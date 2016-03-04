@@ -85,6 +85,11 @@ func (e *entry) AddCallstack() {
 		}
 		cs = append(cs, fmt.Sprintf("%s:%d", file, line))
 	}
+	for i := len(cs) - 1; i >= 0; i-- {
+		if strings.HasPrefix(cs[i], "runtime/proc.go") {
+			cs = cs[:len(cs)-1]
+		}
+	}
 	e.AddField("callstack", strings.Join(cs, ", "))
 }
 
