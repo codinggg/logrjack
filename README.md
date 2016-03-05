@@ -126,7 +126,7 @@ This package is meant to output [logfmt](https://github.com/kr/logfmt) formatted
 Notable differences from Logrus:
 - `Entry` is an interface.
 - Instead of calling `WithField` and receiving `*Entry`, call `AddField` like above. The Logrus `Entry` is wrapped in an unexported type. The downside is you can't setup a base `Entry` to be passed to multiple routines which write their separate log entries from the same base. Call `NewEntry` and copy the values if you want this behavior.
-- A handy `AddCallstack` method, useful for logging errors and panics. It adds a key named `callstack` and is formatted `dir/file.go:##, dir/file2.go##`. Entries which end in `.s`, such as `runtime/asm_amd64.s`, are omitted from the callstack. If the last entry is `runtime/proc.go` it's also omitted. All other entries are included, including `runtime/panic.go` in a panic recovery.
+- A handy `AddCallstack` method, useful for logging errors and panics. It adds a key named `callstack` and is formatted `dir/file.go:##, dir/file2.go:##`. `runtime/proc.go`, `http/server.go`, and files which end in `.s`, such as `runtime/asm_amd64.s`, are omitted from the callstack. All other entries are included, including `runtime/panic.go` in a panic recovery.
 - `AddField` takes a `map[string]interface{}` so the interface can be implemented in a nested-vendor setup. You can create your own type as above to shorten the code.
 
 Notable differences from Lumberjack:
