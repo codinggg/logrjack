@@ -73,6 +73,8 @@ func (e *entry) AddFields(fields map[string]interface{}) {
 }
 
 // AddCallstack adds the current callstack to the Entry using the key "callstack".
+//
+// Excludes runtime/proc.go, http/server.go, and files ending in .s from the callstack.
 func (e *entry) AddCallstack() {
 	var cs []string
 	for i := 0; ; i++ {
@@ -80,15 +82,12 @@ func (e *entry) AddCallstack() {
 		if file == "???" {
 			break
 		}
-		if strings.HasSuffix(file, ".s") {
+		if strings.HasSuffix(file, ".s") ||
+			strings.HasPrefix(file, "http/server.go") ||
+			strings.HasPrefix(file, "runtime/proc.go") {
 			continue
 		}
 		cs = append(cs, fmt.Sprintf("%s:%d", file, line))
-	}
-	for i := len(cs) - 1; i >= 0; i-- {
-		if strings.HasPrefix(cs[i], "runtime/proc.go") {
-			cs = cs[:len(cs)-1]
-		}
 	}
 	e.AddField("callstack", strings.Join(cs, ", "))
 }
