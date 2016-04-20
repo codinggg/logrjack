@@ -1,3 +1,14 @@
+#!/bin/bash
+
+# go get -u github.com/kisielk/errcheck
+# go get -u github.com/golang/lint/golint
+# go get -u honnef.co/go/simple/cmd/gosimple
+# go get -u honnef.co/go/unused/cmd/unused
+# go get -u github.com/mdempsky/unconvert
+# go get -u github.com/client9/misspell/cmd/misspell
+# go get -u github.com/gordonklaus/ineffassign
+# go get -u github.com/fzipp/gocyclo
+
 FILES=$(ls *.go)
 
 echo "Checking gofmt..."
@@ -46,6 +57,67 @@ done
 
 if [ ${lintError} -ne 0 ]; then
   exit 255
+fi
+
+echo "Checking gosimple..."
+gosimpleRes=$(gosimple .)
+if [ $? -ne 0 ]; then
+  echo "gosimple checking failed: ${gosimpleRes}!"
+  exit 255
+fi
+if [ -n "${gosimpleRes}" ]; then
+  echo "gosimple checking failed: ${gosimpleRes}"
+  exit 255
+fi
+
+echo "Checking unused..."
+unusedRes=$(unused .)
+if [ $? -ne 0 ]; then
+  echo "unused checking failed: ${unusedRes}!"
+  exit 255
+fi
+if [ -n "${unusedRes}" ]; then
+  echo "unused checking failed: ${unusedRes}"
+  exit 255
+fi
+
+echo "Checking unconvert..."
+unconvertRes=$(unconvert .)
+if [ $? -ne 0 ]; then
+  echo "unconvert checking failed: ${unconvertRes}!"
+  exit 255
+fi
+if [ -n "${unconvertRes}" ]; then
+  echo "unconvert checking failed: ${unconvertRes}"
+  exit 255
+fi
+
+echo "Checking misspell..."
+misspellRes=$(misspell $FILES)
+if [ $? -ne 0 ]; then
+  echo "misspell checking failed: ${misspellRes}!"
+  exit 255
+fi
+if [ -n "${misspellRes}" ]; then
+  echo "misspell checking failed: ${misspellRes}"
+  exit 255
+fi
+
+echo "Checking ineffassign..."
+ineffassignRes=$(ineffassign -n .)
+if [ $? -ne 0 ]; then
+  echo "ineffassign checking failed: ${ineffassignRes}!"
+  exit 255
+fi
+if [ -n "${ineffassignRes}" ]; then
+  echo "ineffassign checking failed: ${ineffassignRes}"
+  exit 255
+fi
+
+echo "Checking gocyclo..."
+gocycloRes=$(gocyclo -over 15 $FILES)
+if [ -n "${gocycloRes}" ]; then
+  echo "gocyclo warning: ${gocycloRes}"
 fi
 
 echo "Running tests..."
