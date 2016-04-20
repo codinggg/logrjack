@@ -17,21 +17,41 @@ type entry struct {
 // Use AddField or AddFields (opposed to Logrus' WithField)
 // to add new fields to an entry.
 //
-// To add source file and line information call AddErrFields.
-// Typically this value will be 2 for normal calls or 5 if you're in
-// a panic recover.
+// To add source file and line information call AddCallstack.
 //
-// Call the Info, Warn, or Error methods to write the log entry.
+// Call the Info, Warn, Error, or Fatal methods to write the log entry.
 type Entry interface {
+	// AddField adds a single field to the Entry.
 	AddField(key string, value interface{})
+
+	// AddFields adds a map of fields to the Entry.
 	AddFields(fields map[string]interface{})
+
+	// AddCallstack adds the current callstack to the Entry using the key "callstack".
+	//
+	// Excludes runtime/proc.go, http/server.go, and files ending in .s from the callstack.
 	AddCallstack()
+
+	// Info logs the Entry with a status of "info".
 	Info(args ...interface{})
+	// Infof logs the Entry with a status of "info".
 	Infof(format string, args ...interface{})
+	// Warn logs the Entry with a status of "warn".
 	Warn(args ...interface{})
+	// Warnf logs the Entry with a status of "warn".
 	Warnf(format string, args ...interface{})
+	// Error logs the Entry with a status of "error".
 	Error(args ...interface{})
+	// Errorf logs the Entry with a status of "error".
 	Errorf(format string, args ...interface{})
+	// Fatal logs the Entry with a status of "fatal" and calls os.Exit(1).
+	Fatal(args ...interface{})
+	// Fatalf logs the Entry with a status of "fatal" and calls os.Exit(1).
+	Fatalf(format string, args ...interface{})
+
+	// AddError adds a field "err" with the specified error.
+	AddError(err error)
+
 	String() string
 }
 
@@ -41,10 +61,22 @@ func init() {
 	std = logrus.StandardLogger()
 }
 
-// NewEntry creates a new log entry
+// NewEntry creates a new log Entry.
 func NewEntry() Entry {
 	e := &entry{}
 	e.entry = logrus.NewEntry(std)
+	return e
+}
+
+// Callstack creates a new log Entry with the callstack. If 'err' is not nil,
+// an entry "err" is added with the specified error.
+func Callstack(err error) Entry {
+	e := &entry{}
+	e.entry = logrus.NewEntry(std)
+	e.addCallstack(3)
+	if err != nil {
+		e.AddError(err)
+	}
 	return e
 }
 
@@ -56,6 +88,11 @@ func (e entry) String() string {
 		return fmt.Sprintf("%s - <%s>", s, err)
 	}
 	return s
+}
+
+// AddError adds a field "err" with the specified error.
+func (e *entry) AddError(err error) {
+	e.AddField("err", err)
 }
 
 // AddField adds a single field to the Entry.
@@ -76,9 +113,13 @@ func (e *entry) AddFields(fields map[string]interface{}) {
 //
 // Excludes runtime/proc.go, http/server.go, and files ending in .s from the callstack.
 func (e *entry) AddCallstack() {
+	e.addCallstack(3)
+}
+
+func (e *entry) addCallstack(skipFrames int) {
 	var cs []string
 	for i := 0; ; i++ {
-		file, line := getCaller(2 + i)
+		file, line := getCaller(skipFrames + i)
 		if file == "???" {
 			break
 		}
@@ -92,34 +133,44 @@ func (e *entry) AddCallstack() {
 	e.AddField("callstack", strings.Join(cs, ", "))
 }
 
-// Info logs the Entry with a status of "info"
+// Info logs the Entry with a status of "info".
 func (e *entry) Info(args ...interface{}) {
 	e.entry.Info(args...)
 }
 
-// Info logs the Entry with a status of "info"
+// Infof logs the Entry with a status of "info".
 func (e *entry) Infof(format string, args ...interface{}) {
 	e.entry.Infof(format, args...)
 }
 
-// Warn logs the Entry with a status of "warn"
+// Warn logs the Entry with a status of "warn".
 func (e *entry) Warn(args ...interface{}) {
 	e.entry.Warn(args...)
 }
 
-// Warnf logs the Entry with a status of "warn"
+// Warnf logs the Entry with a status of "warn".
 func (e *entry) Warnf(format string, args ...interface{}) {
 	e.entry.Warnf(format, args...)
 }
 
-// Error logs the Entry with a status of "error"
+// Error logs the Entry with a status of "error".
 func (e *entry) Error(args ...interface{}) {
 	e.entry.Error(args...)
 }
 
-// Errorf logs the Entry with a status of "error"
+// Errorf logs the Entry with a status of "error".
 func (e *entry) Errorf(format string, args ...interface{}) {
 	e.entry.Errorf(format, args...)
+}
+
+// Fatal logs the Entry with a status of "fatal" and calls os.Exit(1).
+func (e *entry) Fatal(args ...interface{}) {
+	e.entry.Fatal(args...)
+}
+
+// Fatalf logs the Entry with a status of "fatal" and calls os.Exit(1).
+func (e *entry) Fatalf(format string, args ...interface{}) {
+	e.entry.Fatalf(format, args...)
 }
 
 func getCaller(skip int) (file string, line int) {
