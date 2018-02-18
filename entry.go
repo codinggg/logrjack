@@ -2,10 +2,9 @@ package logrjack
 
 import (
 	"fmt"
-
 	"strings"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 type entry struct {
