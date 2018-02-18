@@ -1,6 +1,6 @@
 package logrjack
 
-import "github.com/Sirupsen/logrus"
+import "github.com/sirupsen/logrus"
 
 // Info logs an Entry with a status of "info"
 func Info(args ...interface{}) {

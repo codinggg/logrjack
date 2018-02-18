@@ -1,10 +1,9 @@
 package logrjack
 
 import (
-	"strings"
-
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/pkg/errors"
 )
