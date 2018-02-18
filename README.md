@@ -1,4 +1,8 @@
 # logrjack
+
+[![GoDoc](https://godoc.org/github.com/judwhite/logrjack?status.svg)](https://godoc.org/github.com/judwhite/logrjack) [![MIT License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/judwhite/logrjack/blob/develop/LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/judwhite/logrjack)](https://goreportcard.com/report/github.com/judwhite/logrjack)
+[![Build Status](https://travis-ci.org/judwhite/logrjack.svg?branch=develop)](https://travis-ci.org/judwhite/logrjack)
+
 [Logrus](https://github.com/Sirupsen/logrus) (structured, leveled logging) and [Lumberjack](https://github.com/natefinch/lumberjack) (rolling logs).
 
 # Example
